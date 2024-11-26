@@ -16,6 +16,9 @@ Swagger(app)
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+# BASE_URL 설정: 환경 변수에서 가져오거나, 테스트 기본값("http://3.36.174.88:5001") 사용
+BASE_URL = os.getenv("BASE_URL", "http://3.36.174.88:5001").rstrip("/")
+
 matplotlib.use('Agg')
 
 # CSV 파일 경로 설정
@@ -98,7 +101,7 @@ def get_gyeonggi_favorites_image():
         create_image_with_text(results, output_path)
 
         # 이미지 URL 반환
-        image_url = f"http://127.0.0.1:5001/static/gyeonggi_favorites.png"
+        image_url = f"{BASE_URL}/static/gyeonggi_favorites.png"
         return jsonify({"imageUrl": image_url})
 
     except Exception as e:
@@ -184,7 +187,7 @@ def generate_gender_distribution_image(output_path):
     성별 분포 그래프를 생성하고 이미지를 저장
     """
     try:
-        api_url = "http://127.0.0.1:5001/api/gyeonggi-favorites"
+        api_url = f"{BASE_URL}/api/gyeonggi-favorites"
         user_data, store_favorite, api_data = preprocess_data(
             api_url, user_data_path, store_favorite_path, store_info_path
         )
@@ -232,7 +235,7 @@ def generate_age_distribution_image(output_path):
     """
     try:
         # API 데이터 가져오기
-        API_URL = "http://127.0.0.1:5001/api/gyeonggi-favorites"
+        API_URL = f"{BASE_URL}/api/gyeonggi-favorites"
         response = requests.get(API_URL)
         if response.status_code == 200:
             data = response.json()
@@ -477,13 +480,13 @@ def get_target_store_visualization():
 
         # 모든 이미지 URL 반환
         return jsonify({
-            "genderImageUrl": f"http://127.0.0.1:5001/static/gender_distribution_target_store.png",
-            "ageImageUrl": f"http://127.0.0.1:5001/static/age_distribution_target_store.png",
-            "menuImageUrl": f"http://127.0.0.1:5001/static/favorite_menu_distribution_target_store.png",
-            "busiestAndLeastBusyImageUrl": f"http://127.0.0.1:5001/static/busiest_and_least_busy.png",
-            "averageCongestionImageUrl": f"http://127.0.0.1:5001/static/average_congestion.png",
-            "genderDistributionImageUrl": f"http://127.0.0.1:5001/static/gender_distribution.png",
-            "ageDistributionImageUrl": f"http://127.0.0.1:5001/static/age_distribution.png"
+            "genderImageUrl": f"{BASE_URL}/static/gender_distribution_target_store.png",
+            "ageImageUrl": f"{BASE_URL}/static/age_distribution_target_store.png",
+            "menuImageUrl": f"{BASE_URL}/static/favorite_menu_distribution_target_store.png",
+            "busiestAndLeastBusyImageUrl": f"{BASE_URL}/static/busiest_and_least_busy.png",
+            "averageCongestionImageUrl": f"{BASE_URL}/static/average_congestion.png",
+            "genderDistributionImageUrl": f"{BASE_URL}/static/gender_distribution.png",
+            "ageDistributionImageUrl": f"{BASE_URL}/static/age_distribution.png"
         })
 
     except Exception as e:
