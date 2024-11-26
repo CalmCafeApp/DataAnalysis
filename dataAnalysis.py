@@ -3,6 +3,7 @@ import pandas as pd
 from flask import Flask, jsonify, request, send_from_directory
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 import requests
 import json
 from requests.models import Response
@@ -10,9 +11,36 @@ from flask_cors import CORS
 from flask import make_response
 from flasgger import Swagger
 from PIL import Image, ImageDraw, ImageFont
+import platform
 
 app = Flask(__name__)
 Swagger(app)
+
+# 시스템에 맞는 폰트 설정 함수
+def set_font_for_all_graphs():
+    try:
+        if platform.system() == 'Darwin':  # macOS
+            font_path = '/System/Library/Fonts/Supplemental/AppleGothic.ttf'
+        elif platform.system() == 'Windows':  # Windows
+            font_path = 'C:/Windows/Fonts/malgun.ttf'
+        else:  # Linux
+            font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
+
+        if not os.path.exists(font_path):
+            raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {font_path}")
+
+        font_prop = font_manager.FontProperties(fname=font_path)
+        matplotlib.rcParams['font.family'] = font_prop.get_name()
+        matplotlib.rcParams['axes.unicode_minus'] = False  # 음수 기호 처리
+
+        print(f"폰트 설정 완료: {font_prop.get_name()}")
+
+    except Exception as e:
+        print(f"폰트 설정 오류: {e}")
+        raise e
+
+set_font_for_all_graphs()
+
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -48,11 +76,19 @@ def create_image_with_text(data, output_path):
     img = Image.new("RGB", (width, height), color=background_color)
     draw = ImageDraw.Draw(img)
 
-    # 폰트 설정
+   # 폰트 경로 설정
     try:
-        font_path = "/Library/Fonts/AppleSDGothicNeo.ttc"  # MacOS 시스템 폰트
+        if platform.system() == 'Darwin':  # macOS
+            font_path = "/Library/Fonts/AppleSDGothicNeo.ttc"
+        elif platform.system() == 'Windows':  # Windows
+            font_path = "C:\\Windows\\Fonts\\malgun.ttf"
+        else:  # Linux
+            font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"  # Linux에서 사용하는 한글 폰트
+
+        # 폰트 로드
         font = ImageFont.truetype(font_path, 20)
     except IOError:
+        # 폰트 로드 실패 시 기본 폰트 사용
         font = ImageFont.load_default()
 
     # 텍스트 내용 작성
@@ -210,7 +246,6 @@ def generate_gender_distribution_image(output_path):
         # 그래프 생성
         if not gender_distribution.empty:
             plt.figure(figsize=(12, 8))
-            plt.rc('font', family='AppleGothic')
             gender_distribution[['남', '여']].plot(kind='bar', stacked=True, color=['skyblue', 'pink'])
             plt.title('주변 즐겨찾기 카페 성별 분포', fontsize=18)
             plt.xlabel('카페 이름', fontsize=14)
@@ -278,13 +313,15 @@ def generate_age_distribution_image(output_path):
         age_distribution = age_distribution.dropna()
         age_distribution.set_index('name', inplace=True)
 
+        
+
         if not age_distribution.empty:
 
             age_colors = ['#f09e90', '#edd75f', '#67c967', '#5c95cc', '#faa7d4', '#c4a6e0']
 
             # 그래프 생성
+            
             plt.figure(figsize=(12, 8))
-            plt.rc('font', family='AppleGothic')
 
             age_distribution[labels].plot(
                 kind='bar', stacked=True, color=age_colors, ax=plt.gca()
@@ -338,7 +375,6 @@ def generate_busiest_and_least_busy_times():
 
     # 그래프 1: 가장 붐비는 시간대와 가장 한가한 시간대
     plt.figure(figsize=(10, 6))
-    plt.rc('font', family='AppleGothic')
 
     # 가장 붐비는 시간대
     plt.bar(busiest_times['weekday_korean'], busiest_times['predicted_people'], color='lightcoral', label='가장 붐비는 시간대')
@@ -423,7 +459,6 @@ def visualize_favorites_by_store():
             raise ValueError("해당 사용자의 설문조사 데이터가 없습니다.")
         
         # 성별 분포
-        plt.rc('font', family='AppleGothic')
         gender_counts = matched_survey_data['gender'].value_counts()
         gender_counts.plot(kind='bar', color=['lightpink', 'skyblue'], rot=0, title='성별 분포')
         plt.ylabel('인원 수')
@@ -446,7 +481,6 @@ def visualize_favorites_by_store():
         # 선호 메뉴 분포
         favorite_menu_counts = matched_survey_data['favorite_menu'].value_counts()
         favorite_menu_counts.plot(kind='bar', color='#8a6857', rot=45, title='선호 메뉴 분포')
-        plt.rc('font', family='AppleGothic')
         plt.ylabel('선호도')
         menu_path = os.path.join(STATIC_FOLDER, 'favorite_menu_distribution_target_store.png')
         plt.savefig(menu_path, bbox_inches='tight')
