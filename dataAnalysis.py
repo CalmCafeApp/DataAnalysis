@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, send_file
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
@@ -15,31 +15,6 @@ import platform
 
 app = Flask(__name__)
 Swagger(app)
-
-# 시스템에 맞는 폰트 설정 함수
-def set_font_for_all_graphs():
-    try:
-        if platform.system() == 'Darwin':  # macOS
-            font_path = '/System/Library/Fonts/Supplemental/AppleGothic.ttf'
-        elif platform.system() == 'Windows':  # Windows
-            font_path = 'C:/Windows/Fonts/malgun.ttf'
-        else:  # Linux
-            font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
-
-        if not os.path.exists(font_path):
-            raise FileNotFoundError(f"폰트 파일을 찾을 수 없습니다: {font_path}")
-
-        font_prop = font_manager.FontProperties(fname=font_path)
-        matplotlib.rcParams['font.family'] = font_prop.get_name()
-        matplotlib.rcParams['axes.unicode_minus'] = False  # 음수 기호 처리
-
-        print(f"폰트 설정 완료: {font_prop.get_name()}")
-
-    except Exception as e:
-        print(f"폰트 설정 오류: {e}")
-        raise e
-
-set_font_for_all_graphs()
 
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -247,11 +222,11 @@ def generate_gender_distribution_image(output_path):
         if not gender_distribution.empty:
             plt.figure(figsize=(12, 8))
             gender_distribution[['남', '여']].plot(kind='bar', stacked=True, color=['skyblue', 'pink'])
-            plt.title('주변 즐겨찾기 카페 성별 분포', fontsize=18)
-            plt.xlabel('카페 이름', fontsize=14)
-            plt.ylabel('즐겨찾기 수 (명)', fontsize=14)
+            plt.title('Gender Distribution in Nearby Favorite Cafes', fontsize=18)
+            plt.xlabel('Cafe Name', fontsize=14)
+            plt.ylabel('Number of Favorites (People)', fontsize=14)
             plt.xticks(rotation=55, fontsize=10)
-            plt.legend(title='성별', labels=['남성', '여성'], fontsize=12)
+            plt.legend(title='Gender', labels=['Male', 'Female'], fontsize=12)
             plt.tight_layout()
             plt.savefig(output_path)
             plt.close()
@@ -291,7 +266,7 @@ def generate_age_distribution_image(output_path):
         )
 
         bins = [0, 19, 29, 39, 49, 59, 120]
-        labels = ['20대 미만', '20대', '30대', '40대', '50대', '60대 이상']
+        labels = ['Under 20s', '20s', '30s', '40s', '50s', '60s and Above']
         user_age_data['age_group'] = pd.cut(user_age_data['age'], bins=bins, labels=labels, right=False)
 
         # 연령대별 카페별 방문자 수 집계
@@ -326,11 +301,11 @@ def generate_age_distribution_image(output_path):
             age_distribution[labels].plot(
                 kind='bar', stacked=True, color=age_colors, ax=plt.gca()
             )
-            plt.title('주변 즐겨찾기 카페 연령대 분포', fontsize=18)
-            plt.xlabel('카페 이름', fontsize=14)
-            plt.ylabel('즐겨찾기 수 (명)', fontsize=14)
+            plt.title('Age Distribution in Nearby Favorite Cafes', fontsize=18)
+            plt.xlabel('Cafe Name', fontsize=14)
+            plt.ylabel('Number of Favorites (People)', fontsize=14)
             plt.xticks(rotation=45, fontsize=12)
-            plt.legend(title='연령대', fontsize=12)
+            plt.legend(title='Age Group', fontsize=12)
             plt.tight_layout()
 
             # 이미지 저장
@@ -349,7 +324,7 @@ def generate_age_distribution_image(output_path):
 
 # 요일 순서 지정 및 한글 매핑
 weekday_order = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-weekday_korean = ['일', '월', '화', '수', '목', '금', '토']
+weekday_korean = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 
 def generate_busiest_and_least_busy_times():
@@ -377,33 +352,33 @@ def generate_busiest_and_least_busy_times():
     plt.figure(figsize=(10, 6))
 
     # 가장 붐비는 시간대
-    plt.bar(busiest_times['weekday_korean'], busiest_times['predicted_people'], color='lightcoral', label='가장 붐비는 시간대')
+    plt.bar(busiest_times['weekday_korean'], busiest_times['predicted_people'], color='lightcoral', label='Busiest Time')
     for i, row in busiest_times.iterrows():
         plt.text(
             row['weekday_korean'], 
             row['predicted_people'] + 0.5,  # 텍스트를 막대 위로 배치
-            f"{int(row['hour'])}시", 
+            f"{int(row['hour'])}o'clock", 
             ha='center', 
             va='bottom', 
             fontsize=10
         )
 
     # 가장 한가한 시간대
-    plt.bar(least_busy_times['weekday_korean'], least_busy_times['predicted_people'], color='skyblue', label='가장 한가한 시간대')
+    plt.bar(least_busy_times['weekday_korean'], least_busy_times['predicted_people'], color='skyblue', label='Calmest Time')
     for i, row in least_busy_times.iterrows():
         plt.text(
             row['weekday_korean'], 
             row['predicted_people'] + 0.2,  # 텍스트를 막대 위로 배치
-            f"{int(row['hour'])}시", 
+            f"{int(row['hour'])}o'clock", 
             ha='center', 
             va='bottom', 
             fontsize=10, 
             color='black',
             bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)  # 텍스트 배경 추가
         )
-    plt.title('요일별 가장 붐비는 시간대와 한가한 시간대', fontsize=16)
-    plt.xlabel('요일', fontsize=10)
-    plt.ylabel('혼잡도 (예측 인원 수)', fontsize=12)
+    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=16)
+    plt.xlabel('Week', fontsize=10)
+    plt.ylabel('Congestion', fontsize=12)
     plt.ylim(0, data['predicted_people'].max() + 2) 
     plt.legend()
     plt.tight_layout()
@@ -415,9 +390,9 @@ def generate_busiest_and_least_busy_times():
     # 그래프 2: 평균 혼잡도
     plt.figure(figsize=(10, 6))
     plt.bar(average_congestion['weekday_korean'], average_congestion['predicted_people'], color='#2E8465', label='평균 혼잡도')
-    plt.title('요일별 평균 혼잡도', fontsize=16)
-    plt.xlabel('요일', fontsize=10)
-    plt.ylabel('평균 혼잡도 (예측 인원 수)', fontsize=12)
+    plt.title('Average Congestion by Day of the Week', fontsize=16)
+    plt.xlabel('Week', fontsize=10)
+    plt.ylabel('Congestion', fontsize=12)
     plt.ylim(0, data['predicted_people'].max() + 2) 
     plt.legend()
     plt.tight_layout()
@@ -460,28 +435,28 @@ def visualize_favorites_by_store():
         
         # 성별 분포
         gender_counts = matched_survey_data['gender'].value_counts()
-        gender_counts.plot(kind='bar', color=['lightpink', 'skyblue'], rot=0, title='성별 분포')
-        plt.ylabel('인원 수')
+        gender_counts.plot(kind='bar', color=['lightpink', 'skyblue'], rot=0, title='Gender Distribution')
+        plt.ylabel('Number of People')
         gender_path = os.path.join(STATIC_FOLDER, 'gender_distribution_target_store.png')
         plt.savefig(gender_path)
         plt.close()
         
         # 연령대별 분포
         age_bins = [0, 19, 29, 39, 49, 59, 120]
-        age_labels = ['20대 미만', '20대', '30대', '40대', '50대', '60대 이상']
+        age_labels = ['Under 20s', '20s', '30s', '40s', '50s', '60s and Above']
         matched_survey_data['age_group'] = pd.cut(matched_survey_data['age'], bins=age_bins, labels=age_labels, right=False)
         age_counts = matched_survey_data['age_group'].value_counts().sort_index()
-        age_counts.plot(kind='bar', color='#e38a6d', rot=0, title='연령대별 분포')
+        age_counts.plot(kind='bar', color='#e38a6d', rot=0, title='Age Distribution')
         plt.rc('font', family='AppleGothic')
-        plt.ylabel('인원 수')
+        plt.ylabel('Number of People')
         age_path = os.path.join(STATIC_FOLDER, 'age_distribution_target_store.png')
         plt.savefig(age_path)
         plt.close()
         
         # 선호 메뉴 분포
         favorite_menu_counts = matched_survey_data['favorite_menu'].value_counts()
-        favorite_menu_counts.plot(kind='bar', color='#8a6857', rot=45, title='선호 메뉴 분포')
-        plt.ylabel('선호도')
+        favorite_menu_counts.plot(kind='bar', color='#8a6857', rot=45, title='Favorite Menu Distribution')
+        plt.ylabel('Preference')
         menu_path = os.path.join(STATIC_FOLDER, 'favorite_menu_distribution_target_store.png')
         plt.savefig(menu_path, bbox_inches='tight')
         plt.close()
@@ -519,7 +494,7 @@ def get_target_store_visualization():
             "menuImageUrl": f"{BASE_URL}/static/favorite_menu_distribution_target_store.png",
             "busiestAndLeastBusyImageUrl": f"{BASE_URL}/static/busiest_and_least_busy.png",
             "averageCongestionImageUrl": f"{BASE_URL}/static/average_congestion.png",
-            "genderDistributionImageUrl": f"{BASE_URL}/static/gender_distribution.png",
+            "genderDistributionImageUrl": f"{BASE_URL}/static/gender_distribution.png?cache_buster=12345",
             "ageDistributionImageUrl": f"{BASE_URL}/static/age_distribution.png"
         })
 
@@ -536,6 +511,14 @@ def get_target_store_visualization():
 @app.route('/static/<path:filename>')
 def serve_static(filename):
     return send_from_directory(STATIC_FOLDER, filename)
+
+@app.route('/static/<filename>')
+def serve_image(filename):
+    return send_file(f'./static/{filename}', mimetype='image/png')
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 404  # 빈 응답을 반환하여 404 오류 처리
 
 
 if __name__ == '__main__':
