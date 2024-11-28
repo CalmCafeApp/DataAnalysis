@@ -389,7 +389,7 @@ def generate_busiest_and_least_busy_times():
 
     # 그래프 2: 평균 혼잡도
     plt.figure(figsize=(10, 6))
-    plt.bar(average_congestion['weekday_korean'], average_congestion['predicted_people'], color='#2E8465', label='평균 혼잡도')
+    plt.bar(average_congestion['weekday_korean'], average_congestion['predicted_people'], color='#2E8465', label='average_congestion')
     plt.title('Average Congestion by Day of the Week', fontsize=16)
     plt.xlabel('Week', fontsize=10)
     plt.ylabel('Congestion', fontsize=12)
