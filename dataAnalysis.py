@@ -436,6 +436,7 @@ def visualize_favorites_by_store():
         # 성별 분포
         gender_counts = matched_survey_data['gender'].value_counts()
         gender_counts.plot(kind='bar', color=['lightpink', 'skyblue'], rot=0, title='Gender Distribution')
+        plt.xticks(ticks=range(len(gender_counts)), labels=['Female', 'Male'])
         plt.ylabel('Number of People')
         gender_path = os.path.join(STATIC_FOLDER, 'gender_distribution_target_store.png')
         plt.savefig(gender_path)
