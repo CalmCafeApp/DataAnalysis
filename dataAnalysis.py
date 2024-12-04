@@ -187,6 +187,8 @@ def preprocess_data(api_url, user_data_path, store_favorite_path, store_info_pat
 
         # 병합
         merged_api_data = pd.merge(api_data, store_info[['id', 'name']], on='name', how='left')
+
+        print(merged_api_data[['name', 'id']])  # 이름과 id를 확인해 봄
         return user_data, store_favorite, merged_api_data
     except Exception as e:
         print(f"데이터 처리 오류: {e}")
@@ -260,6 +262,10 @@ def generate_age_distribution_image(output_path):
         store_favorite = pd.read_csv(store_favorite_path)
         store_info = pd.read_csv(store_info_path)
 
+        # 카페 이름 확인
+        print(store_info[['name']].head())
+        print(df_api[['name']].head())
+
         # 데이터 병합 및 정제
         user_age_data = pd.merge(
             store_favorite, user_data[['user_id', 'age']], on='user_id', how='inner'
@@ -271,6 +277,7 @@ def generate_age_distribution_image(output_path):
 
         # 연령대별 카페별 방문자 수 집계
         user_age_data['age_group'] = user_age_data['age_group'].astype(str)  # 문자열로 변환
+        print(user_age_data.head())
         age_distribution = user_age_data.groupby(['store_id', 'age_group']).size().unstack(fill_value=0)
 
         # API 데이터와 Store 정보 병합
