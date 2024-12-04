@@ -367,7 +367,7 @@ def generate_busiest_and_least_busy_times():
             f"{int(row['hour'])}o'clock", 
             ha='center', 
             va='bottom', 
-            fontsize=10
+            fontsize=12
         )
 
     # 가장 한가한 시간대
@@ -384,6 +384,7 @@ def generate_busiest_and_least_busy_times():
             bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)  # 텍스트 배경 추가
         )
     plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=14)
+    plt.xticks(fontsize=12)
     plt.xlabel('Week', fontsize=12)
     plt.ylabel('Congestion', fontsize=12)
     plt.ylim(0, data['predicted_people'].max() + 2) 
@@ -398,6 +399,7 @@ def generate_busiest_and_least_busy_times():
     plt.figure(figsize=(10, 6))
     plt.bar(average_congestion['weekday_korean'], average_congestion['predicted_people'], color='#2E8465', label='average_congestion')
     plt.title('Average Congestion by Day of the Week', fontsize=14)
+    plt.xticks(fontsize=12)
     plt.xlabel('Week', fontsize=12)
     plt.ylabel('Congestion', fontsize=12)
     plt.ylim(0, data['predicted_people'].max() + 2) 
@@ -443,8 +445,10 @@ def visualize_favorites_by_store():
         # 성별 분포
         gender_counts = matched_survey_data['gender'].value_counts()
         gender_counts.plot(kind='bar', color=['lightpink', 'skyblue'], rot=0, title='Gender Distribution')
-        plt.xticks(ticks=range(len(gender_counts)), labels=['Female', 'Male'])
-        plt.ylabel('Number of People')
+        plt.title('Gender Distribution', fontsize=14)  # 제목 폰트 크기 설정
+        plt.xlabel('Gender', fontsize=12)  # x축 폰트 크기 설정
+        plt.ylabel('Number of People', fontsize=12)  # y축 폰트 크기 설정
+        plt.xticks(ticks=range(len(gender_counts)), labels=['Female', 'Male'], fontsize = 12)
         gender_path = os.path.join(STATIC_FOLDER, 'gender_distribution_target_store.png')
         plt.savefig(gender_path)
         plt.close()
@@ -456,7 +460,10 @@ def visualize_favorites_by_store():
         age_counts = matched_survey_data['age_group'].value_counts().sort_index()
         age_counts.plot(kind='bar', color='#e38a6d', rot=0, title='Age Distribution')
         plt.rc('font', family='AppleGothic')
-        plt.ylabel('Number of People')
+        plt.xticks(fontsize=12)
+        plt.title('Age Distribution', fontsize=14)  # 제목 폰트 크기 설정
+        plt.xlabel('Age', fontsize=12)  # x축 폰트 크기 설정
+        plt.ylabel('Number of People', fontsize=12)  # y축 폰트 크기 설정
         age_path = os.path.join(STATIC_FOLDER, 'age_distribution_target_store.png')
         plt.savefig(age_path)
         plt.close()
@@ -464,8 +471,11 @@ def visualize_favorites_by_store():
         # 선호 메뉴 분포
         favorite_menu_counts = matched_survey_data['favorite_menu'].value_counts()
         favorite_menu_counts.plot(kind='bar', color='#8a6857', rot=45, title='Favorite Menu Distribution')
-        plt.ylabel('Preference')
         menu_path = os.path.join(STATIC_FOLDER, 'favorite_menu_distribution_target_store.png')
+        plt.xticks(fontsize=12)
+        plt.title('Favorite Menu Distribution', fontsize=14)  # 제목 폰트 크기 설정
+        plt.xlabel('Preference', fontsize=12)  # x축 폰트 크기 설정
+        plt.ylabel('Number of People', fontsize=12)  # y축 폰트 크기 설정
         plt.savefig(menu_path, bbox_inches='tight')
         plt.close()
         
