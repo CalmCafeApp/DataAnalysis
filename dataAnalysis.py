@@ -224,10 +224,10 @@ def generate_gender_distribution_image(output_path):
         if not gender_distribution.empty:
             plt.figure(figsize=(12, 8))
             gender_distribution[['남', '여']].plot(kind='bar', stacked=True, color=['skyblue', 'pink'])
-            plt.title('Gender Distribution in Nearby Favorite Cafes', fontsize=18)
-            plt.xlabel('Cafe Name', fontsize=14)
-            plt.ylabel('Number of Favorites (People)', fontsize=14)
-            plt.xticks(rotation=55, fontsize=10)
+            plt.title('Gender Distribution in Nearby Favorite Cafes', fontsize=14)
+            plt.xlabel('Cafe Name', fontsize=12)
+            plt.ylabel('Number of Favorites (People)', fontsize=12)
+            plt.xticks(rotation=55, fontsize=12)
             plt.legend(title='Gender', labels=['Male', 'Female'], fontsize=12)
             plt.tight_layout()
             plt.savefig(output_path)
@@ -308,9 +308,9 @@ def generate_age_distribution_image(output_path):
             age_distribution[labels].plot(
                 kind='bar', stacked=True, color=age_colors, ax=plt.gca()
             )
-            plt.title('Age Distribution in Nearby Favorite Cafes', fontsize=18)
-            plt.xlabel('Cafe Name', fontsize=14)
-            plt.ylabel('Number of Favorites (People)', fontsize=14)
+            plt.title('Age Distribution in Nearby Favorite Cafes', fontsize=14)
+            plt.xlabel('Cafe Name', fontsize=12)
+            plt.ylabel('Number of Favorites (People)', fontsize=12)
             plt.xticks(rotation=45, fontsize=12)
             plt.legend(title='Age Group', fontsize=12)
             plt.tight_layout()
@@ -379,12 +379,12 @@ def generate_busiest_and_least_busy_times():
             f"{int(row['hour'])}o'clock", 
             ha='center', 
             va='bottom', 
-            fontsize=10, 
+            fontsize=12, 
             color='black',
             bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)  # 텍스트 배경 추가
         )
-    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=16)
-    plt.xlabel('Week', fontsize=10)
+    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=14)
+    plt.xlabel('Week', fontsize=12)
     plt.ylabel('Congestion', fontsize=12)
     plt.ylim(0, data['predicted_people'].max() + 2) 
     plt.legend()
@@ -397,8 +397,8 @@ def generate_busiest_and_least_busy_times():
     # 그래프 2: 평균 혼잡도
     plt.figure(figsize=(10, 6))
     plt.bar(average_congestion['weekday_korean'], average_congestion['predicted_people'], color='#2E8465', label='average_congestion')
-    plt.title('Average Congestion by Day of the Week', fontsize=16)
-    plt.xlabel('Week', fontsize=10)
+    plt.title('Average Congestion by Day of the Week', fontsize=14)
+    plt.xlabel('Week', fontsize=12)
     plt.ylabel('Congestion', fontsize=12)
     plt.ylim(0, data['predicted_people'].max() + 2) 
     plt.legend()
