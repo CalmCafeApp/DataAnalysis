@@ -306,7 +306,7 @@ def generate_age_distribution_image(output_path):
             plt.figure(figsize=(12, 8))
 
             age_distribution[labels].plot(
-                kind='bar', stacked=True, color=age_colors, ax=plt.gca()
+                kind='bar', stacked=True, color=age_colors
             )
             plt.title('Age Distribution in Nearby Favorite Cafes', fontsize=14)
             plt.xlabel('Cafe Name', fontsize=12)
@@ -356,7 +356,7 @@ def generate_busiest_and_least_busy_times():
     average_congestion['weekday_korean'] = average_congestion['weekday'].map(dict(zip(weekday_order, weekday_korean)))
 
     # 그래프 1: 가장 붐비는 시간대와 가장 한가한 시간대
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(8, 7))
 
     # 가장 붐비는 시간대
     plt.bar(busiest_times['weekday_korean'], busiest_times['predicted_people'], color='lightcoral', label='Busiest Time')
@@ -367,7 +367,7 @@ def generate_busiest_and_least_busy_times():
             f"{int(row['hour'])}o'clock", 
             ha='center', 
             va='bottom', 
-            fontsize=12
+            fontsize=14
         )
 
     # 가장 한가한 시간대
@@ -379,16 +379,16 @@ def generate_busiest_and_least_busy_times():
             f"{int(row['hour'])}o'clock", 
             ha='center', 
             va='bottom', 
-            fontsize=12, 
+            fontsize=14, 
             color='black',
             bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)  # 텍스트 배경 추가
         )
-    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.xlabel('Week', fontsize=12)
-    plt.ylabel('Congestion', fontsize=12)
+    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=18)
+    plt.xticks(fontsize=18)
+    plt.xlabel('Week', fontsize=16)
+    plt.ylabel('Congestion', fontsize=16)
     plt.ylim(0, data['predicted_people'].max() + 2) 
-    plt.legend()
+    plt.legend(fontsize=14)
     plt.tight_layout()
 
     busiest_and_least_busy_path = os.path.join(STATIC_FOLDER, 'busiest_and_least_busy.png')
@@ -396,14 +396,14 @@ def generate_busiest_and_least_busy_times():
     plt.close()
 
     # 그래프 2: 평균 혼잡도
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(7, 5))
     plt.bar(average_congestion['weekday_korean'], average_congestion['predicted_people'], color='#2E8465', label='average_congestion')
-    plt.title('Average Congestion by Day of the Week', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.xlabel('Week', fontsize=12)
-    plt.ylabel('Congestion', fontsize=12)
+    plt.title('Average Congestion by Day of the Week', fontsize=18)
+    plt.xticks(fontsize=16)
+    plt.xlabel('Week', fontsize=16)
+    plt.ylabel('Congestion', fontsize=16)
     plt.ylim(0, data['predicted_people'].max() + 2) 
-    plt.legend()
+    plt.legend(fontsize=16)
     plt.tight_layout()
 
     average_congestion_path = os.path.join(STATIC_FOLDER, 'average_congestion.png')
