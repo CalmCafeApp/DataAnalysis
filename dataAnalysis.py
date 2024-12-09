@@ -188,7 +188,7 @@ def preprocess_data(api_url, user_data_path, store_favorite_path, store_info_pat
         # 병합
         merged_api_data = pd.merge(api_data, store_info[['id', 'name']], on='name', how='left')
 
-        #print(merged_api_data[['name', 'id']])  # 이름과 id를 확인해 봄
+        print(merged_api_data[['name', 'id']])  # 이름과 id를 확인해 봄
         return user_data, store_favorite, merged_api_data
     except Exception as e:
         print(f"데이터 처리 오류: {e}")
@@ -263,8 +263,8 @@ def generate_age_distribution_image(output_path):
         store_info = pd.read_csv(store_info_path)
 
         # 카페 이름 확인
-        #print(store_info[['name']].head())
-        #print(df_api[['name']].head())
+        print(store_info[['name']].head())
+        print(df_api[['name']].head())
 
         # 데이터 병합 및 정제
         user_age_data = pd.merge(
@@ -277,7 +277,7 @@ def generate_age_distribution_image(output_path):
 
         # 연령대별 카페별 방문자 수 집계
         user_age_data['age_group'] = user_age_data['age_group'].astype(str)  # 문자열로 변환
-        #print(user_age_data.head())
+        print(user_age_data.head())
         age_distribution = user_age_data.groupby(['store_id', 'age_group']).size().unstack(fill_value=0)
 
         # API 데이터와 Store 정보 병합
@@ -383,7 +383,7 @@ def generate_busiest_and_least_busy_times():
             color='black',
             bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)  # 텍스트 배경 추가
         )
-    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=22)
+    plt.title('Busiest and Calmest Time Periods by Day of the Week', fontsize=18)
     plt.xticks(fontsize=18)
     plt.xlabel('Week', fontsize=16)
     plt.ylabel('Congestion', fontsize=16)
@@ -445,53 +445,37 @@ def visualize_favorites_by_store():
         # 성별 분포
         gender_counts = matched_survey_data['gender'].value_counts()
         gender_counts.plot(kind='bar', color=['lightpink', 'skyblue'], rot=0, title='Gender Distribution')
-        plt.title('Gender Distribution', fontsize=20)  # 제목 폰트 크기 설정
-        plt.xlabel('Gender', fontsize=16)  # x축 폰트 크기 설정
-        plt.ylabel('Number of People', fontsize=18)  # y축 폰트 크기 설정
-        plt.xticks(ticks=range(len(gender_counts)), labels=['Female', 'Male'], fontsize = 16)
+        plt.title('Gender Distribution', fontsize=14)  # 제목 폰트 크기 설정
+        plt.xlabel('Gender', fontsize=12)  # x축 폰트 크기 설정
+        plt.ylabel('Number of People', fontsize=12)  # y축 폰트 크기 설정
+        plt.xticks(ticks=range(len(gender_counts)), labels=['Female', 'Male'], fontsize = 12)
         gender_path = os.path.join(STATIC_FOLDER, 'gender_distribution_target_store.png')
         plt.savefig(gender_path)
         plt.close()
         
         # 연령대별 분포
         age_bins = [0, 19, 29, 39, 49, 59, 120]
-        age_labels = ['Under 20s', '20s', '30s', '40s', '50s', '60s Above']
+        age_labels = ['Under 20s', '20s', '30s', '40s', '50s', '60s and Above']
         matched_survey_data['age_group'] = pd.cut(matched_survey_data['age'], bins=age_bins, labels=age_labels, right=False)
         age_counts = matched_survey_data['age_group'].value_counts().sort_index()
-
-        # 플롯 생성
-        fig, ax = plt.subplots(figsize=(8, 6))  # figsize로 그림 크기 조정 가능
-        bar_width = 0.5  # 막대 너비
-        bar_positions = range(len(age_counts))
-
-        ax.bar(bar_positions, age_counts, color='#e38a6d', width=bar_width)
-        plt.xticks(bar_positions)
-        ax.set_xticklabels(age_counts.index, fontsize =16)
+        age_counts.plot(kind='bar', color='#e38a6d', rot=0, title='Age Distribution')
         plt.rc('font', family='AppleGothic')
-        plt.title('Age Distribution', fontsize=24)  # 제목 폰트 크기 설정
-        plt.xlabel('Age', fontsize=16)  # x축 폰트 크기 설정
-        plt.ylabel('Number of People', fontsize=16)  # y축 폰트 크기 설정
+        plt.xticks(fontsize=12)
+        plt.title('Age Distribution', fontsize=14)  # 제목 폰트 크기 설정
+        plt.xlabel('Age', fontsize=12)  # x축 폰트 크기 설정
+        plt.ylabel('Number of People', fontsize=12)  # y축 폰트 크기 설정
         age_path = os.path.join(STATIC_FOLDER, 'age_distribution_target_store.png')
         plt.savefig(age_path)
         plt.close()
         
         # 선호 메뉴 분포
         favorite_menu_counts = matched_survey_data['favorite_menu'].value_counts()
-        # 플롯 생성
-        fig, ax = plt.subplots(figsize=(8, 6))  # 플롯 크기 설정
-        bar_width = 0.4  # 막대 너비
-        bar_positions = range(len(favorite_menu_counts))
-
-        ax.bar(bar_positions, favorite_menu_counts, color='#8a6857', width=bar_width)
-
-        # 막대 레이블 및 제목 설정
-        ax.set_xticks(bar_positions)
-        ax.set_xticklabels(favorite_menu_counts.index, fontsize=18)  # 글자 회전 조정
-        ax.set_title('Favorite Menu Distribution', fontsize=20)  # 제목 폰트 크기 설정
-        ax.set_xlabel('Preference', fontsize=16)  # x축 폰트 크기 설정
-        ax.set_ylabel('Number of People', fontsize=18)  # y축 폰트 크기 설정
-
+        favorite_menu_counts.plot(kind='bar', color='#8a6857', rot=45, title='Favorite Menu Distribution')
         menu_path = os.path.join(STATIC_FOLDER, 'favorite_menu_distribution_target_store.png')
+        plt.xticks(fontsize=12)
+        plt.title('Favorite Menu Distribution', fontsize=14)  # 제목 폰트 크기 설정
+        plt.xlabel('Preference', fontsize=12)  # x축 폰트 크기 설정
+        plt.ylabel('Number of People', fontsize=12)  # y축 폰트 크기 설정
         plt.savefig(menu_path, bbox_inches='tight')
         plt.close()
         
